@@ -1,0 +1,10 @@
+<div>
+    <h1>Chat</h1>
+    <h2>ejemplo de cliente socket.io</h2>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io(); socket.emit("init_message", "hola a todos");
+    socket.on("welcome", (data) => { console.log(data); })
+</script>
