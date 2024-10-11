@@ -1,10 +1,67 @@
-<div>
-    <h1>Chat</h1>
-    <h2>ejemplo de cliente socket.io</h2>
+<div class="chat-container shadow rounded">
+    <!-- Encabezado del chat -->
+    <div class="text-center bg-primary text-white py-3 rounded-top">
+        <h1 class="h4 mb-0">Chat de sugo</h1>
+    </div>
+
+    <!-- Ventana de chat -->
+    <div class="chat-window p-3 bg-light" id="chat-window" style="height: 350px; overflow-y: auto;">
+        <div class="message received bg-white p-2 rounded mb-3 shadow-sm">
+            Hola, ¿cómo estás?
+        </div>
+    </div>
+
+    <!-- Campo de entrada -->
+    <div class="input-group p-3 bg-white">
+        <input type="text" class="form-control" placeholder="Escribe tu mensaje..." id="message-input">
+        <button class="btn btn-primary" id="send-button">Enviar</button>
+    </div>
 </div>
 
+<!-- Script -->
 <script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    const socket = io(); socket.emit("init_message", "hola a todos");
-    socket.on("welcome", (data) => { console.log(data); })
+    const url = "" // URL del servidor
+    const options = {} 
+    const user = {nickname: ''}
+    const msg = document.getElementById('message-input')
+    const chat = document.getElementById('chat-window')
+
+
+    const name = async () => {
+        const result = await Swal.fire({
+            title: 'Chat de sugo',
+            input: 'text',
+            text: 'Bienvenido, indica tu nombre para el chat',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Por favor indica tu nombre'
+                } 
+            }
+        })
+
+        user.nickname = result.value || 'invitado'
+        
+    }
+
+    // Conectarse al servidor
+    const socket = io(url, options);
+    
+    // Escuchar eventos del servidor
+    socket.on('connect', async () => {
+        console.log(`Conectado al servidor socket.io ${url}`);
+
+        await name()
+    });
+
+    msg.addEventListener('keyup', (event) => {
+        if (event.key === "Enter" && msg.value !== "") {
+            event.preventDefault();
+            const data = {user: user.nickname, message: msg.value}
+            socket.emit('message', data);
+            console.log(data);
+            msg.value = "";
+        }
+    });
 </script>

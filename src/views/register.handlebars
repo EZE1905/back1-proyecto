@@ -1,15 +1,65 @@
-<h1>Formulario de registro</h1>
+<h1 class="text-center my-4 mb-5">Formulario de registro</h1>
 
-<div>
-    <form action="/api/users" method="post">
-        <input type="text" id="firstName" name="firstName" />
-        <br />
-        <input type="text" id="lastName" name="lastName" />
-        <br />
-        <input type="text" id="email" name="email" />
-        <br />
-        <input type="password" id="password" name="password" />
-        <br />
-        <button type="submit">Enviar</button>
+<div class="container">
+    <form action="/api/users" method="post" class="row g-3">
+        <!-- Nombre -->
+        <div class="col-md-6">
+            <label for="firstName" class="form-label">Nombre</label>
+            <input
+                type="text"
+                class="form-control"
+                id="firstName"
+                name="firstName"
+                placeholder="Ingresa tu nombre"
+                required
+            />
+        </div>
+
+        <!-- Apellido -->
+        <div class="col-md-6">
+            <label for="lastName" class="form-label">Apellido</label>
+            <input
+                type="text"
+                class="form-control"
+                id="lastName"
+                name="lastName"
+                placeholder="Ingresa tu apellido"
+                required
+            />
+        </div>
+
+        <!-- Correo Electrónico -->
+        <div class="col-md-12">
+            <label for="email" class="form-label">Correo Electrónico</label>
+            <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                placeholder="email@ejemplo.com"
+                required
+            />
+        </div>
+
+        <!-- Contraseña -->
+        <div class="col-md-12">
+            <label for="password" class="form-label">Contraseña</label>
+            <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                placeholder="Ingresa tu contraseña"
+                required
+            />
+        </div>
+
+        <!-- Botón de envío -->
+        <div class="col-12 text-center">
+            <button
+                type="submit"
+                class="btn btn-primary mt-4 w-25 p-3"
+            >Enviar</button>
+        </div>
     </form>
 </div>

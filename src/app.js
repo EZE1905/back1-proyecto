@@ -19,12 +19,6 @@ const socketServer = new Server(httpServer);
 socketServer.on("connection", (socket) => {
     console.log("Nuevo cliente conectado con el id: " + socket.id);
 
-    socket.emit("welcome", "Bienvenido a nuestro chat");
-
-    socket.on("init_message", (data) => {
-        console.log(data);
-    });
-
     socket.on("disconnect", () => {
         console.log("Cliente desconectado con el id: " + socket.id);
     });
