@@ -6,9 +6,6 @@
 
     <!-- Ventana de chat -->
     <div class="chat-window p-3 bg-light" id="chat-window" style="height: 350px; overflow-y: auto;">
-        <div class="message received bg-white p-2 rounded mb-3 shadow-sm">
-            Hola, ¿cómo estás?
-        </div>
     </div>
 
     <!-- Campo de entrada -->
@@ -24,7 +21,7 @@
 <script>
     const url = "" // URL del servidor
     const options = {} 
-    const user = {nickname: ''}
+    const user = {nickName: ''}
     const msg = document.getElementById('message-input')
     const chat = document.getElementById('chat-window')
 
@@ -41,27 +38,60 @@
             }
         })
 
-        user.nickname = result.value || 'invitado'
+        user.nickName = result.value || 'invitado'
         
     }
 
-    // Conectarse al servidor
-    const socket = io(url, options);
-    
-    // Escuchar eventos del servidor
-    socket.on('connect', async () => {
-        console.log(`Conectado al servidor socket.io ${url}`);
+    const notificacion = (text) => {
+        Swal.fire({
+            text: text,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+        })
+    }
 
-        await name()
+    // Listener para el campo de mensajes. Cada vez que se presione enter,
+    // se revisa si contiene algo y se envía un emit new_own_msg al servidor
+    msg.addEventListener('keyup', event => {
+        if (event.key === 'Enter' && msg.value !== '') {
+            const data = { user: user.nickName, msg: msg.value };
+            socketClient.emit('new_own_msg', data);
+            msg.value = '';
+        }
     });
 
-    msg.addEventListener('keyup', (event) => {
-        if (event.key === "Enter" && msg.value !== "") {
-            event.preventDefault();
-            const data = {user: user.nickname, message: msg.value}
-            socket.emit('message', data);
-            console.log(data);
-            msg.value = "";
-        }
+    // Conexión al SERVIDOR websockets
+    const socketClient = io(url, options);
+
+    // Se habilita un listener atento a la conexión
+    // Cuando este cliente logra conectar con el servidor, se ejecuta este callback
+    socketClient.on('connect', async () => {
+        console.log(`Conectado servidor socket.io ${url}`);
+        await name();
+        // Se le envía el nickname al servidor
+        socketClient.emit('new_user_data', { user: user.nickName });
+    });
+
+    // Suscripciones
+    // current_messages lo genera el servidor al conectarse el cliente, le envía
+    // la lista actual de mensajes en el chat
+    socketClient.on('current_messages', data => {
+        chat.innerHTML = '';
+        data.forEach(msg => {
+            chat.innerHTML += `<div class="message received bg-white p-2 rounded mb-3 shadow-sm">[${msg.user}] ${msg.msg}</div>`;
+        });
+    });
+
+    // new_general_msg lo genera el servidor para TODOS cuando recibe de CUALQUIER
+    // cliente un nuevo mensaje
+    socketClient.on('new_general_msg', data => {
+        chat.innerHTML += `<div class="message received bg-white p-2 rounded mb-3 shadow-sm">[${data.user}] ${data.msg}</div>`;
+    });
+
+    // new_user lo genera el servidor cuando recibe datos de un usuario nuevo conectado
+    socketClient.on('new_user', data => {
+        notificacion(`${data.user} se ha conectado!`);
     });
 </script>
